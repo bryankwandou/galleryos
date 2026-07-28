@@ -9,6 +9,16 @@ export type StudioImage = {
   included: boolean;
 };
 
+export type VisionCullResult = {
+  decision: CullFlag;
+  confidence: number;
+  visibleReason: string;
+  technicalNotes: string[];
+  model: string;
+  requestId: string;
+  analyzedAt: string;
+};
+
 export type Booking = {
   id: string;
   client: string;

@@ -15,3 +15,11 @@ Production image objects must use private storage and short-lived signed access.
 ## Vertical slice
 
 This repository starts with a deployable interface and domain invariants instead of claiming unconfigured infrastructure works. Database, storage, authentication, jobs, payments, email, and model calls become production features only after their credentials and external resources exist.
+
+## AI capability honesty
+
+The available Groq account exposes text reasoning models but no vision model. GalleryOS therefore computes deterministic technical metrics from actual browser-decoded pixels—Laplacian sharpness variance, mean luminance, and clipping ratios—and sends only those measurements to Groq. The agent cannot claim it saw expressions, identity, framing, or subject matter. This remains useful for a technical first pass while preserving an honest capability boundary.
+
+## Solana evidence
+
+Wallet verification uses an Ed25519 signed challenge and does not request a transaction from the connected wallet. A separately configured, funded devnet evidence signer writes SHA-256 workflow digests to the Solana Memo program. Public-key verification is visible in the app and every successful anchor links to Solana Explorer.

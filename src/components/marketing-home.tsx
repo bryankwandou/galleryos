@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "motion/react";
 import { ArrowRight, Check, ChevronRight, Clock3, Eye, Images, LockKeyhole, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "./logo";
@@ -19,21 +22,21 @@ export function MarketingHome() {
       </nav>
 
       <section className="hero shell">
-        <div className="hero-copy hero-enter">
+        <motion.div className="hero-copy" initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7 }}>
           <div className="eyebrow"><Sparkles size={14} /> Built for working photographers</div>
           <h1>Your best frames,<br /><em>ready sooner.</em></h1>
           <p>Move from a full memory card to a polished client gallery without losing your judgment—or your weekend.</p>
           <div className="hero-actions"><Link className="button button-accent" href="/dashboard">Start a gallery <ArrowRight size={16} /></Link><a className="text-link" href="#workflow">See the workflow <ChevronRight size={15} /></a></div>
           <div className="hero-note"><Check size={14} /> Nothing is removed without your approval</div>
-        </div>
+        </motion.div>
 
-        <div className="gallery-frame gallery-enter">
+        <motion.div className="gallery-frame" initial={{ opacity: 0, scale: .96, rotate: 1.2 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ duration: .85, delay: .15 }} whileHover={{ y: -5 }}>
           <div className="gallery-top"><span>H + C</span><div>Harper & Chen <small>New York · July 2026</small></div><button>♡</button></div>
           <div className="photo-mosaic">
             {photos.map((photo, index) => <div key={photo} className={`photo photo-${index + 1}`} style={{ backgroundImage: `url(${photo})` }} />)}
           </div>
           <div className="floating-card"><span className="pulse-dot" /><div><b>Gallery ready</b><small>184 photographs · 6 min ago</small></div></div>
-        </div>
+        </motion.div>
       </section>
 
       <section className="signal-strip"><div className="shell signals"><span><b>684</b> frames reviewed</span><span><b>2h 14m</b> estimated time saved</span><span><b>184</b> final selects</span><span><b>0</b> automatic deletions</span></div></section>
