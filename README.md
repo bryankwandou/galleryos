@@ -27,6 +27,7 @@ Production integrations are intentionally not represented as complete. See `docs
 ## Live proof workflow
 
 1. Open `/dashboard` and choose **Cull review** to run the Vision Cull Agent.
+   You can select a local JPEG, PNG, or WebP under 20 MB; the source file remains in the browser and only technical measurements reach Groq.
 2. Choose **Clients** to connect Phantom or Solflare and sign the ownership challenge.
 3. Choose **Galleries** and publish with proof to write the approved image manifest digest to Solana devnet.
 4. Follow the displayed Solana Explorer link to independently verify the transaction.

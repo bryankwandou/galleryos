@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { assertRateLimit, assertSameOrigin } from "@/lib/request-security";
 
 const schema = z.object({
   filename: z.string().min(1).max(160),
@@ -9,6 +10,8 @@ const schema = z.object({
 export async function POST(request: Request) {
   if (!process.env.GROQ_API_KEY) return Response.json({ error: "AI vision is not configured" }, { status: 503 });
   try {
+    assertSameOrigin(request);
+    assertRateLimit(request, "ai-cull", 10, 60_000);
     const input = schema.parse(await request.json());
     const model = process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile";
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -25,6 +28,7 @@ export async function POST(request: Request) {
     const parsed = z.object({ decision: z.enum(["keep", "review", "remove"]), confidence: z.number().min(0).max(1), visibleReason: z.string().min(1).max(200), technicalNotes: z.array(z.string()).min(1).max(3) }).parse(JSON.parse(payload.choices[0].message.content));
     return Response.json({ ...parsed, model, requestId: response.headers.get("x-request-id") ?? crypto.randomUUID(), analyzedAt: new Date().toISOString() });
   } catch (error) {
-    return Response.json({ error: error instanceof Error ? error.message : "Image analysis failed" }, { status: 502 });
+    const message = error instanceof Error ? error.message : "Image analysis failed";
+    return Response.json({ error: message }, { status: message.includes("Rate limit") ? 429 : message.includes("origin") ? 403 : 502 });
   }
 }

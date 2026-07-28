@@ -44,10 +44,16 @@ export function StudioShell() {
     setNotice(`Live AI suggestion applied to ${images.find((image) => image.id === id)?.name}. Inclusion still requires your decision.`);
   }
 
+  function addLocalImage(image: StudioImage) {
+    setImages((current) => [...current, image]);
+    setNotice(`${image.name} loaded locally. Its pixels stay in this browser while technical metrics are measured.`);
+  }
+
   async function publishGallery() {
     setNotice("Anchoring the approved gallery manifest to Solana devnet…");
     try {
-      const response = await fetch("/api/proofs/workflow", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ bookingId: "harper-chen", includedImageIds: images.filter((image) => image.included).map((image) => image.id), excludedImageIds: images.filter((image) => !image.included).map((image) => image.id), approvedByWallet: walletProof?.address }) });
+      if (!walletProof) throw new Error("Verify the studio wallet in Clients before publishing a devnet proof.");
+      const response = await fetch("/api/proofs/workflow", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ bookingId: "harper-chen", includedImageIds: images.filter((image) => image.included).map((image) => image.id), excludedImageIds: images.filter((image) => !image.included).map((image) => image.id) }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error);
       setAnchorUrl(result.anchor.explorerUrl ?? "");
@@ -71,7 +77,7 @@ export function StudioShell() {
       <div className="studio-main">
         <header className="topbar"><button className="menu-button" onClick={() => setMenuOpen(true)}><Menu size={20} /></button><div className="search"><Search size={16} /><input aria-label="Search" placeholder="Search bookings and clients" /><kbd>⌘ K</kbd></div><div className="top-actions">{systemStatus && <div className="live-status"><span className={systemStatus.aiAgent ? "online" : ""}>AI</span><span className={systemStatus.solana.rpcHealthy && systemStatus.solana.anchoringEnabled ? "online" : ""}>Devnet</span><span className={systemStatus.walletVerification ? "online" : ""}>Wallet</span></div>}<button className="icon-button"><Clock3 size={17} /></button><button className="studio-button"><Upload size={15} /> Upload shoot</button></div></header>
         {active === "Cull review" ? (
-          <CullReview images={images} excludedCount={excludedCount} onDecision={decideImage} onAnalysis={applyAnalysis} onPublish={publishGallery} notice={notice} anchorUrl={anchorUrl} />
+          <CullReview images={images} excludedCount={excludedCount} onDecision={decideImage} onAnalysis={applyAnalysis} onLocalImage={addLocalImage} onPublish={publishGallery} notice={notice} anchorUrl={anchorUrl} />
         ) : active === "Galleries" ? (
           <GalleryManager images={images} onPublish={publishGallery} notice={notice} anchorUrl={anchorUrl} />
         ) : active === "Clients" ? (
@@ -100,11 +106,11 @@ function Overview({ filter, setFilter, visibleBookings, onCull }: { filter: stri
   </main>;
 }
 
-function CullReview({ images, excludedCount, onDecision, onAnalysis, onPublish, notice, anchorUrl }: { images: StudioImage[]; excludedCount: number; onDecision: (id: string, included: boolean) => void; onAnalysis: (id: string, result: VisionCullResult) => void; onPublish: () => void; notice: string; anchorUrl: string }) {
+function CullReview({ images, excludedCount, onDecision, onAnalysis, onLocalImage, onPublish, notice, anchorUrl }: { images: StudioImage[]; excludedCount: number; onDecision: (id: string, included: boolean) => void; onAnalysis: (id: string, result: VisionCullResult) => void; onLocalImage: (image: StudioImage) => void; onPublish: () => void; notice: string; anchorUrl: string }) {
   return <main className="studio-content">
     <div className="page-title compact"><div><span>Harper & Chen · City hall wedding</span><h1>Cull review</h1><p>Suggestions are guidance only. Nothing leaves the gallery until you confirm it.</p></div><button className="studio-button" onClick={onPublish}>Prepare gallery <ArrowUpRight size={15} /></button></div>
     {notice && <div className="notice"><Check size={16} />{notice}{anchorUrl && <a href={anchorUrl} target="_blank" rel="noreferrer">Verify transaction</a>}</div>}
-    <AiCullAgent images={images} onApply={onAnalysis} />
+    <AiCullAgent images={images} onApply={onAnalysis} onLocalImage={onLocalImage} />
     <div className="review-summary"><div><b>{images.length}</b><span>Frames sampled</span></div><div><b>{images.filter(i => i.flag === "review").length}</b><span>Need judgment</span></div><div><b>{excludedCount}</b><span>Confirmed out</span></div><div className="review-legend"><span><i className="dot keep" />Keep</span><span><i className="dot review" />Review</span><span><i className="dot remove" />Likely out</span></div></div>
     <div className="cull-grid">{images.map((image) => <article className={!image.included ? "cull-card excluded" : "cull-card"} key={image.id}><div className="cull-photo" style={{backgroundImage:`url(${image.url})`}}><span className={`flag ${image.flag}`}>{image.flag}</span>{!image.included && <div className="excluded-label">Excluded</div>}</div><div className="cull-meta"><div><b>{image.name}</b><p>{image.reason}</p></div><div className="decision-buttons"><button aria-label={`Include ${image.name}`} className={image.included ? "selected" : ""} onClick={() => onDecision(image.id, true)}><Check size={15} /></button><button aria-label={`Exclude ${image.name}`} className={!image.included ? "selected reject" : ""} onClick={() => onDecision(image.id, false)}><X size={15} /></button></div></div></article>)}</div>
   </main>;

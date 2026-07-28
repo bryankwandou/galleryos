@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
-import { BrainCircuit, Check, LoaderCircle, RotateCcw, Sparkles } from "lucide-react";
+import { BrainCircuit, Check, LoaderCircle, RotateCcw, Sparkles, Upload } from "lucide-react";
 import type { StudioImage, VisionCullResult } from "@/lib/types";
 
 async function measurePixels(imageUrl: string) {
-  const response = await fetch(`/api/image-proxy?url=${encodeURIComponent(imageUrl)}`);
+  const response = await fetch(imageUrl.startsWith("blob:") ? imageUrl : `/api/image-proxy?url=${encodeURIComponent(imageUrl)}`);
   if (!response.ok) throw new Error("Unable to load image pixels for analysis");
   const blob = await response.blob();
   const bitmap = await createImageBitmap(blob);
@@ -27,12 +27,20 @@ async function measurePixels(imageUrl: string) {
   return { width: originalWidth, height: originalHeight, meanLuminance: sum / luminance.length, darkClippingRatio: dark / luminance.length, brightClippingRatio: bright / luminance.length, sharpnessVariance: laplacianSquared / samples - laplacianMean * laplacianMean };
 }
 
-export function AiCullAgent({ images, onApply }: { images: StudioImage[]; onApply: (id: string, result: VisionCullResult) => void }) {
+export function AiCullAgent({ images, onApply, onLocalImage }: { images: StudioImage[]; onApply: (id: string, result: VisionCullResult) => void; onLocalImage: (image: StudioImage) => void }) {
   const [selectedId, setSelectedId] = useState(images[0]?.id ?? "");
   const [result, setResult] = useState<VisionCullResult | null>(null);
   const [state, setState] = useState<"idle" | "working" | "done" | "error">("idle");
   const [error, setError] = useState("");
   const selected = images.find((image) => image.id === selectedId) ?? images[0];
+
+  function chooseLocalFile(file: File | undefined) {
+    if (!file) return;
+    if (!file.type.startsWith("image/") || file.size > 20 * 1024 * 1024) { setError("Choose a JPEG, PNG, or WebP image under 20 MB."); setState("error"); return; }
+    const id = `local-${crypto.randomUUID()}`;
+    onLocalImage({ id, name: file.name, url: URL.createObjectURL(file), flag: "review", reason: "Awaiting real technical analysis", included: true });
+    setSelectedId(id); setResult(null); setError(""); setState("idle");
+  }
 
   async function analyze() {
     setState("working"); setError(""); setResult(null);
@@ -47,6 +55,6 @@ export function AiCullAgent({ images, onApply }: { images: StudioImage[]; onAppl
 
   return <motion.section className="agent-panel" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
     <div className="agent-title"><div><BrainCircuit /><span><b>Technical cull agent</b><small>Real browser pixel metrics + Groq reasoning</small></span></div><i>Human approval required</i></div>
-      <div className="agent-body"><div className="agent-picker"><label>Frame to inspect<select value={selectedId} onChange={(event) => { setSelectedId(event.target.value); setResult(null); setState("idle"); }}>{images.map((image) => <option value={image.id} key={image.id}>{image.name}</option>)}</select></label><div className="agent-thumb" style={{ backgroundImage: `url(${selected.url})` }} /><button onClick={analyze} disabled={state === "working"}>{state === "working" ? <><LoaderCircle className="spin" /> Measuring pixels</> : <><Sparkles /> Run real analysis</>}</button></div><div className="agent-result">{state === "idle" && <div className="agent-empty"><BrainCircuit /><p>GalleryOS measures actual sharpness, luminance, and clipping, then asks Groq for a conservative technical recommendation.</p></div>}{state === "working" && <div className="agent-empty"><LoaderCircle className="spin" /><p>Measuring real pixels and running grounded model reasoning…</p></div>}{state === "error" && <div className="agent-empty error"><RotateCcw /><p>{error}</p></div>}{result && <div className="analysis-result"><div><span className={`flag ${result.decision}`}>{result.decision}</span><b>{Math.round(result.confidence * 100)}% confidence</b></div><h3>{result.visibleReason}</h3><ul>{result.technicalNotes.map((note) => <li key={note}>{note}</li>)}</ul><small>{result.model} · {result.requestId.slice(0, 18)}</small><button onClick={() => onApply(selected.id, result)}><Check /> Apply as suggestion</button></div>}</div></div>
+      <div className="agent-body"><div className="agent-picker"><label>Frame to inspect<select value={selectedId} onChange={(event) => { setSelectedId(event.target.value); setResult(null); setState("idle"); }}>{images.map((image) => <option value={image.id} key={image.id}>{image.name}</option>)}</select></label><label className="local-upload"><Upload size={13} /> Try your own photograph<input type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => chooseLocalFile(event.target.files?.[0])} /></label><div className="agent-thumb" style={{ backgroundImage: `url(${selected.url})` }} /><button onClick={analyze} disabled={state === "working"}>{state === "working" ? <><LoaderCircle className="spin" /> Measuring pixels</> : <><Sparkles /> Run real analysis</>}</button></div><div className="agent-result">{state === "idle" && <div className="agent-empty"><BrainCircuit /><p>GalleryOS measures actual sharpness, luminance, and clipping, then asks Groq for a conservative technical recommendation.</p></div>}{state === "working" && <div className="agent-empty"><LoaderCircle className="spin" /><p>Measuring real pixels and running grounded model reasoning…</p></div>}{state === "error" && <div className="agent-empty error"><RotateCcw /><p>{error}</p></div>}{result && <div className="analysis-result"><div><span className={`flag ${result.decision}`}>{result.decision}</span><b>{Math.round(result.confidence * 100)}% confidence</b></div><h3>{result.visibleReason}</h3><ul>{result.technicalNotes.map((note) => <li key={note}>{note}</li>)}</ul><small>{result.model} · {result.requestId.slice(0, 18)}</small><button onClick={() => onApply(selected.id, result)}><Check /> Apply as suggestion</button></div>}</div></div>
   </motion.section>;
 }

@@ -11,3 +11,10 @@ Before production launch:
 7. Add rate limits and auditable events to public selection and download endpoints.
 8. Delete both database rows and storage objects during organization erasure.
 9. Maintain independent backups; GalleryOS must never be the only copy of irreplaceable work.
+
+## Implemented MVP controls
+
+- AI and wallet endpoints reject cross-origin browser requests and apply per-instance rate limits.
+- Workflow anchoring requires a short-lived, signed, HttpOnly wallet session created only after Ed25519 verification.
+- Local analysis images remain browser object URLs; only derived technical metrics are sent to Groq.
+- The remote image proxy uses an explicit HTTPS hostname allowlist and verifies image content types.
