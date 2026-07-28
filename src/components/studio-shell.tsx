@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, CalendarDays, Check, ChevronDown, CircleDollarSign, Clock3, Grid2X2, Images, LayoutDashboard, Menu, Search, Settings, Sparkles, Upload, Users, X } from "lucide-react";
+import { ArrowUpRight, CalendarDays, Check, ChevronDown, CircleDollarSign, Clock3, Images, LayoutDashboard, LockKeyhole, Menu, Search, Settings, Sparkles, Upload, Users, X } from "lucide-react";
 import { bookings } from "@/lib/demo-data";
 import type { CullFlag, StudioImage } from "@/lib/types";
 import { Logo } from "./logo";
