@@ -20,6 +20,7 @@ Open `http://localhost:3000`, then use **Open the studio**. The client-facing de
 - Phantom/Solflare signed wallet ownership verification
 - Solana devnet Memo proofs for wallet and gallery manifests
 - Gallery builder preview and client favorites flow
+- Signed client-selection receipts with tamper verification
 - Unit tests for cull decision invariants
 
 Production integrations are intentionally not represented as complete. See `docs/KNOWN_LIMITATIONS.md`.

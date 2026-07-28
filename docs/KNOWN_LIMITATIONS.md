@@ -1,7 +1,7 @@
 # Known Limitations
 
 - Demo photographs are remote editorial samples; no user-upload storage is configured.
-- Dashboard state is browser-memory demo state and does not persist to a database.
+- Cull decisions and gallery favorites persist in the current browser, but cross-device persistence still requires the deferred database/auth layer.
 - Authentication, organizations, and role-based access are not connected.
 - Initial cards contain curated demonstration suggestions; the Technical Cull Agent measures real browser pixels (sharpness, luminance, clipping) and uses configured Groq reasoning with provider metadata. It does not claim semantic visual understanding.
 - Payments, email notifications, background jobs, and downloadable packages are not connected.

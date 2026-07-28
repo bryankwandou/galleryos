@@ -18,3 +18,4 @@ Before production launch:
 - Workflow anchoring requires a short-lived, signed, HttpOnly wallet session created only after Ed25519 verification.
 - Local analysis images remain browser object URLs; only derived technical metrics are sent to Groq.
 - The remote image proxy uses an explicit HTTPS hostname allowlist and verifies image content types.
+- Client selection submissions return HMAC-signed receipts; tampering is rejected by the public receipt-verification endpoint.

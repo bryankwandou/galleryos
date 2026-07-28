@@ -29,8 +29,11 @@ export function StudioShell() {
   const [walletProof, setWalletProof] = useState<WalletProof | null>(null);
   const [anchorUrl, setAnchorUrl] = useState("");
   const [systemStatus, setSystemStatus] = useState<{ aiAgent: boolean; walletVerification: boolean; solana: { rpcHealthy: boolean; anchoringEnabled: boolean } } | null>(null);
+  const [draftReady, setDraftReady] = useState(false);
 
   useEffect(() => { fetch("/api/status").then((response) => response.json()).then(setSystemStatus).catch(() => setSystemStatus(null)); }, []);
+  useEffect(() => { try { const saved = JSON.parse(localStorage.getItem("galleryos:studio:harper-chen") ?? "null") as { images?: StudioImage[] } | null; if (saved?.images) setImages(saved.images.filter((image) => !image.url.startsWith("blob:"))); } finally { setDraftReady(true); } }, []);
+  useEffect(() => { if (draftReady) localStorage.setItem("galleryos:studio:harper-chen", JSON.stringify({ images: images.filter((image) => !image.url.startsWith("blob:")), savedAt: new Date().toISOString() })); }, [draftReady, images]);
 
   const visibleBookings = useMemo(() => filter === "All" ? bookings : bookings.filter((booking) => booking.status === filter), [filter]);
   const excludedCount = images.filter((image) => !image.included).length;
