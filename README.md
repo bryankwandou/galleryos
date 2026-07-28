@@ -31,3 +31,4 @@ Production integrations are intentionally not represented as complete. See `docs
 2. Choose **Clients** to connect Phantom or Solflare and sign the ownership challenge.
 3. Choose **Galleries** and publish with proof to write the approved image manifest digest to Solana devnet.
 4. Follow the displayed Solana Explorer link to independently verify the transaction.
+5. Paste any GalleryOS transaction into `/verify` to validate its signer, Memo label, digest format, confirmation status, and slot directly from devnet RPC.
