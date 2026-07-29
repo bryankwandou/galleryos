@@ -31,7 +31,7 @@ export function MarketingHome() {
         </motion.div>
 
         <motion.div className="gallery-frame" initial={{ opacity: 0, scale: .96, rotate: 1.2 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ duration: .85, delay: .15 }} whileHover={{ y: -5 }}>
-          <div className="gallery-top"><span>H + C</span><div>Harper & Chen <small>New York · July 2026</small></div><button>♡</button></div>
+          <div className="gallery-top"><span>H + C</span><div>Harper & Chen <small>New York · July 2026</small></div><span aria-hidden="true">♡</span></div>
           <div className="photo-mosaic">
             {photos.map((photo, index) => <div key={photo} className={`photo photo-${index + 1}`} style={{ backgroundImage: `url(${photo})` }} />)}
           </div>

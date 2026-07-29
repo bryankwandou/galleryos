@@ -70,20 +70,20 @@ export function StudioShell() {
         <div className="sidebar-head"><Logo dark /><button className="mobile-close" onClick={() => setMenuOpen(false)}><X size={18} /></button></div>
         <div className="workspace"><span className="avatar">NR</span><div><b>North & River</b><small>Studio workspace</small></div><ChevronDown size={14} /></div>
         <nav className="side-nav">
-          {[{name:"Overview",icon:LayoutDashboard},{name:"Bookings",icon:CalendarDays},{name:"Cull review",icon:Sparkles},{name:"Galleries",icon:Images},{name:"Clients",icon:Users}].map(({name,icon:Icon}) => (
+          {[{name:"Overview",icon:LayoutDashboard},{name:"Bookings",icon:CalendarDays},{name:"Cull review",icon:Sparkles},{name:"Galleries",icon:Images},{name:"Identity",icon:Users}].map(({name,icon:Icon}) => (
             <button key={name} className={active === name ? "active" : ""} onClick={() => { setActive(name); setMenuOpen(false); }}><Icon size={17} />{name}{name === "Cull review" && <span>12</span>}</button>
           ))}
         </nav>
-        <div className="sidebar-bottom"><button><Settings size={17} />Settings</button><div className="user-row"><span className="avatar pale">MH</span><div><b>Mara Holt</b><small>Studio owner</small></div></div></div>
+        <div className="sidebar-bottom"><button onClick={() => setActive("Identity")}><Settings size={17} />Identity settings</button><div className="user-row"><span className="avatar pale">MH</span><div><b>Mara Holt</b><small>Studio owner</small></div></div></div>
       </aside>
 
       <div className="studio-main">
-        <header className="topbar"><button className="menu-button" onClick={() => setMenuOpen(true)}><Menu size={20} /></button><div className="search"><Search size={16} /><input aria-label="Search" placeholder="Search bookings and clients" /><kbd>⌘ K</kbd></div><div className="top-actions">{systemStatus && <div className="live-status"><span className={systemStatus.aiAgent ? "online" : ""}>AI</span><span className={systemStatus.solana.rpcHealthy && systemStatus.solana.anchoringEnabled ? "online" : ""}>Devnet</span><span className={systemStatus.walletVerification ? "online" : ""}>Wallet</span></div>}<button className="icon-button"><Clock3 size={17} /></button><button className="studio-button"><Upload size={15} /> Upload shoot</button></div></header>
+        <header className="topbar"><button className="menu-button" onClick={() => setMenuOpen(true)}><Menu size={20} /></button><div className="search"><Search size={16} /><input aria-label="Search" placeholder="Search bookings and clients" onFocus={() => setActive("Bookings")} /><kbd>⌘ K</kbd></div><div className="top-actions">{systemStatus && <div className="live-status"><span className={systemStatus.aiAgent ? "online" : ""}>AI</span><span className={systemStatus.solana.rpcHealthy && systemStatus.solana.anchoringEnabled ? "online" : ""}>Devnet</span><span className={systemStatus.walletVerification ? "online" : ""}>Wallet</span></div>}<button className="icon-button" aria-label="Open overview" onClick={() => setActive("Overview")}><Clock3 size={17} /></button><button className="studio-button" onClick={() => setActive("Cull review")}><Upload size={15} /> Upload shoot</button></div></header>
         {active === "Cull review" ? (
           <CullReview images={images} excludedCount={excludedCount} onDecision={decideImage} onAnalysis={applyAnalysis} onLocalImage={addLocalImage} onPublish={publishGallery} notice={notice} anchorUrl={anchorUrl} />
         ) : active === "Galleries" ? (
           <GalleryManager images={images} onPublish={publishGallery} notice={notice} anchorUrl={anchorUrl} />
-        ) : active === "Clients" ? (
+        ) : active === "Identity" ? (
           <IdentityWorkspace onVerified={setWalletProof} walletProof={walletProof} />
         ) : (
           <Overview filter={filter} setFilter={setFilter} visibleBookings={visibleBookings} onCull={() => setActive("Cull review")} />
