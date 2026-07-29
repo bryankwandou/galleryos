@@ -17,7 +17,7 @@ export function MarketingHome() {
     <main className="marketing">
       <nav className="nav shell">
         <Logo />
-        <div className="nav-links"><a href="#workflow">Workflow</a><a href="#features">Features</a><Link href="/verify">Verify proof</Link><Link href="/pricing">Pricing</Link></div>
+        <div className="nav-links"><a href="#workflow">Workflow</a><a href="#features">Features</a><Link href="/verify" prefetch={false}>Verify proof</Link><Link href="/pricing">Pricing</Link></div>
         <div className="nav-actions"><Link href="/dashboard">Sign in</Link><Link className="button button-dark" href="/dashboard">Open the studio <ArrowRight size={15} /></Link></div>
       </nav>
 
